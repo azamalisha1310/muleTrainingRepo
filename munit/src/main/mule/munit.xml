@@ -23,15 +23,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		</db:select>
 		<choice doc:name="Choice" doc:id="db5e4b90-f33e-4930-b2d8-d301577cc691" >
 			<when expression="#[sizeOf(payload)&gt;0]">
-				<ee:transform doc:name="Transform Message" doc:id="428790f9-d4a6-4974-8f11-363ea15736f3" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-{
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="11ece6a9-197e-4b18-a19b-eaa19c27b054" message="#[payload]"/>
 			</when>
 			<otherwise >
 				<ee:transform doc:name="Transform Message" doc:id="e6135e30-8d41-462d-86a3-39cd002346c2" />
