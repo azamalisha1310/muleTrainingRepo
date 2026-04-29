@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="d0c7166a-0bfd-4d1a-a174-24064d4d814b" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="2cb5c2ed-8937-4219-8d9a-8c4a2b1f80e1" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" />
+	</db:config>
+	<flow name="munitFlow" doc:id="9437ab0d-75dd-4096-9575-6dc4f3da5d1e" >
+		<http:listener doc:name="Listener" doc:id="4fefcd06-666d-4449-8488-4fd0d5c16299" config-ref="HTTP_Listener_config" path="/munit"/>
+		<set-variable value="#[attributes.queryParams.id]" doc:name="Set Variable" doc:id="acaa3cf5-648d-441c-a0df-4d414a248226" variableName="id"/>
+		<db:select doc:name="Select" doc:id="18197b8d-dfe0-4c7a-b748-979a828f8a4e" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM studentinfo.student WHERE Id =:Id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+"Id": vars.id
+}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="db5e4b90-f33e-4930-b2d8-d301577cc691" >
+			<when expression="#[sizeOf(payload)&gt;0]">
+				<ee:transform doc:name="Transform Message" doc:id="428790f9-d4a6-4974-8f11-363ea15736f3" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="e6135e30-8d41-462d-86a3-39cd002346c2" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
